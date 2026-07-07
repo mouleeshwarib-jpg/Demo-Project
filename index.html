@@ -1,0 +1,1324 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Traffic Management System</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #667085;
+      --panel: rgba(255, 255, 255, 0.92);
+      --line: rgba(23, 32, 42, 0.12);
+      --yellow: #facc15;
+      --green: #16a34a;
+      --blue: #2563eb;
+      --purple: #7c3aed;
+      --black: #111827;
+      --amber: var(--yellow);
+      --red: var(--purple);
+      --cyan: var(--blue);
+      --violet: var(--purple);
+      --good: var(--green);
+      --medium: var(--yellow);
+      --high: var(--purple);
+      --shadow: 0 22px 70px rgba(20, 31, 48, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+      background:
+        linear-gradient(120deg, rgba(7, 18, 31, 0.78), rgba(11, 48, 64, 0.58)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' viewBox='0 0 1600 1000'%3E%3Crect width='1600' height='1000' fill='%23111d2b'/%3E%3Cg opacity='.32'%3E%3Cpath d='M0 720 C250 610 330 790 560 700 S950 540 1240 650 1480 755 1600 650' fill='none' stroke='%2306aed5' stroke-width='18'/%3E%3Cpath d='M0 760 C250 650 330 830 560 740 S950 580 1240 690 1480 795 1600 690' fill='none' stroke='%23ffffff' stroke-width='3' stroke-dasharray='30 24'/%3E%3Cpath d='M180 0 L1320 1000' stroke='%231570ef' stroke-width='14'/%3E%3Cpath d='M220 0 L1360 1000' stroke='%23ffffff' stroke-width='3' stroke-dasharray='26 22'/%3E%3Cpath d='M0 240 L1600 360' stroke='%2312b76a' stroke-width='12'/%3E%3Cpath d='M0 276 L1600 396' stroke='%23ffffff' stroke-width='3' stroke-dasharray='28 22'/%3E%3C/g%3E%3Cg opacity='.42' fill='%230a1420'%3E%3Crect x='40' y='460' width='80' height='320'/%3E%3Crect x='145' y='390' width='120' height='390'/%3E%3Crect x='300' y='505' width='86' height='275'/%3E%3Crect x='1240' y='410' width='130' height='370'/%3E%3Crect x='1400' y='480' width='95' height='300'/%3E%3C/g%3E%3Cg fill='%23f6c85f' opacity='.65'%3E%3Ccircle cx='360' cy='230' r='7'/%3E%3Ccircle cx='710' cy='180' r='5'/%3E%3Ccircle cx='1110' cy='260' r='6'/%3E%3Ccircle cx='1330' cy='160' r='5'/%3E%3C/g%3E%3C/svg%3E");
+      background-attachment: fixed;
+      background-size: cover;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      content: "";
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 26px 0 42px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 18px;
+      color: #ffffff;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+
+    .brand-mark svg {
+      width: 27px;
+      height: 27px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.8vw, 2rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.9rem;
+    }
+
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 8px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #21d07a;
+      box-shadow: 0 0 0 0 rgba(33, 208, 122, 0.8);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      70% {
+        box-shadow: 0 0 0 10px rgba(33, 208, 122, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(33, 208, 122, 0);
+      }
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.86fr) minmax(320px, 1.4fr);
+      gap: 20px;
+      align-items: stretch;
+      margin-top: 18px;
+    }
+
+    .panel {
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .selector-panel {
+      padding: 22px;
+    }
+
+    .section-label {
+      margin: 0 0 8px;
+      color: var(--blue);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .selector-panel h2,
+    .dashboard-title h2 {
+      margin: 0;
+      font-size: 1.28rem;
+      letter-spacing: 0;
+    }
+
+    .selector-panel .copy {
+      margin: 9px 0 20px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #344054;
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    select {
+      width: 100%;
+      height: 46px;
+      padding: 0 42px 0 14px;
+      border: 1px solid rgba(23, 32, 42, 0.18);
+      border-radius: 8px;
+      color: var(--ink);
+      background:
+        linear-gradient(45deg, transparent 50%, #667085 50%) calc(100% - 20px) 19px / 7px 7px no-repeat,
+        linear-gradient(135deg, #667085 50%, transparent 50%) calc(100% - 15px) 19px / 7px 7px no-repeat,
+        #ffffff;
+      appearance: none;
+      font-size: 0.96rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    select:focus {
+      border-color: rgba(21, 112, 239, 0.7);
+      box-shadow: 0 0 0 4px rgba(21, 112, 239, 0.12);
+    }
+
+    select:disabled {
+      color: #98a2b3;
+      cursor: not-allowed;
+      background-color: #f2f4f7;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 800;
+    }
+
+    .primary-btn {
+      flex: 1;
+      color: #ffffff;
+      background: linear-gradient(135deg, #1570ef, #06aed5);
+      box-shadow: 0 12px 26px rgba(21, 112, 239, 0.26);
+    }
+
+    .ghost-btn {
+      width: 48px;
+      color: #344054;
+      background: #eef2f6;
+    }
+
+    .system-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .mini-stat {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .mini-stat span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .mini-stat strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 1.12rem;
+    }
+
+    .map-panel {
+      position: relative;
+      overflow: hidden;
+      min-height: 448px;
+      color: #ffffff;
+      background: rgba(8, 20, 35, 0.82);
+    }
+
+    .map-panel::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 42px 42px;
+    }
+
+    .map-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 448px;
+      padding: 22px;
+    }
+
+    .map-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .map-heading h2 {
+      margin: 0;
+      font-size: 1.28rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: max-content;
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.13);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .map-svg {
+      width: 100%;
+      min-height: 255px;
+      flex: 1;
+    }
+
+    .road {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.42);
+      stroke-width: 18;
+      stroke-linecap: round;
+    }
+
+    .road-line {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.78);
+      stroke-width: 3;
+      stroke-dasharray: 18 16;
+      stroke-linecap: round;
+      animation: dash 16s linear infinite;
+    }
+
+    .flow-good {
+      stroke: var(--green);
+    }
+
+    .flow-medium {
+      stroke: var(--yellow);
+    }
+
+    .flow-high {
+      stroke: var(--purple);
+    }
+
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -280;
+      }
+    }
+
+    .node {
+      fill: #ffffff;
+      stroke: var(--blue);
+      stroke-width: 5;
+    }
+
+    .map-footer {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .map-chip {
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .map-chip span {
+      display: block;
+      color: rgba(255, 255, 255, 0.66);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .map-chip strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.96rem;
+    }
+
+    .dashboard {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .dashboard.active {
+      display: block;
+    }
+
+    .dashboard-title {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      background: rgba(5, 16, 28, 0.76);
+      box-shadow: var(--shadow);
+    }
+
+    .dashboard-title p {
+      margin: 8px 0 0;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .time-card {
+      flex: 0 0 auto;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      text-align: right;
+    }
+
+    .time-card span {
+      display: block;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .time-card strong {
+      display: block;
+      margin-top: 4px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .kpi-card {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 14px 34px rgba(16, 24, 40, 0.1);
+    }
+
+    .kpi-card span {
+      color: var(--muted);
+      font-size: 0.79rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .kpi-card strong {
+      display: block;
+      margin-top: 10px;
+      font-size: clamp(1.25rem, 3vw, 1.88rem);
+    }
+
+    .kpi-card p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .info-panel {
+      padding: 20px;
+    }
+
+    .info-panel h3 {
+      margin: 0 0 15px;
+      font-size: 1.04rem;
+    }
+
+    .signal-list,
+    .recommend-list {
+      display: grid;
+      gap: 11px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .signal-list li,
+    .recommend-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #344054;
+      font-size: 0.92rem;
+    }
+
+    .signal-list strong,
+    .recommend-list strong {
+      color: var(--ink);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-width: max-content;
+      padding: 4px 8px;
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .good {
+      background: var(--green);
+    }
+
+    .medium {
+      background: var(--yellow);
+      color: var(--black);
+    }
+
+    .high {
+      background: var(--purple);
+    }
+
+    .blue {
+      background: var(--blue);
+    }
+
+    .traffic-graph {
+      margin-top: 14px;
+      padding: 20px;
+    }
+
+    .graph-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .graph-head h3 {
+      margin: 0;
+      font-size: 1.04rem;
+    }
+
+    .graph-head span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .bar-graph {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      align-items: end;
+      gap: 12px;
+      min-height: 210px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .graph-bar {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 8px;
+      min-width: 0;
+      height: 180px;
+    }
+
+    .graph-fill {
+      align-self: end;
+      min-height: 18px;
+      border-radius: 8px 8px 4px 4px;
+      box-shadow: 0 10px 22px rgba(17, 24, 39, 0.16);
+      transition: height 0.25s ease;
+    }
+
+    .graph-label {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #344054;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .graph-label span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .graph-label strong {
+      color: var(--black);
+      font-size: 0.82rem;
+    }
+
+    .graph-yellow {
+      background: var(--yellow);
+    }
+
+    .graph-green {
+      background: var(--green);
+    }
+
+    .graph-blue {
+      background: var(--blue);
+    }
+
+    .graph-purple {
+      background: var(--purple);
+    }
+
+    .graph-black {
+      background: var(--black);
+    }
+
+    .inspect-blocker {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      color: #ffffff;
+      background: rgba(17, 24, 39, 0.96);
+      text-align: center;
+    }
+
+    .inspect-locked .inspect-blocker {
+      display: grid;
+    }
+
+    .inspect-blocker h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+    }
+
+    .inspect-blocker p {
+      max-width: 520px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.76);
+      line-height: 1.6;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 14px;
+      border-radius: 8px;
+      box-shadow: 0 14px 34px rgba(16, 24, 40, 0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      background: #ffffff;
+    }
+
+    th,
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #edf0f3;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    th {
+      color: #344054;
+      background: #f8fafc;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    td {
+      color: #475467;
+    }
+
+    .empty-state {
+      margin-top: 20px;
+      padding: 24px;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      background: rgba(5, 16, 28, 0.68);
+      box-shadow: var(--shadow);
+    }
+
+    .empty-state h2 {
+      margin: 0 0 8px;
+      font-size: 1.16rem;
+    }
+
+    .empty-state p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bar-graph {
+        grid-template-columns: 1fr;
+      }
+
+      .graph-bar {
+        grid-template-columns: 72px 1fr;
+        grid-template-rows: auto;
+        align-items: center;
+        height: auto;
+      }
+
+      .graph-fill {
+        height: 22px !important;
+        width: var(--bar-width, 50%);
+      }
+
+      .graph-label {
+        text-align: left;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 22px, 1180px);
+        padding-top: 12px;
+      }
+
+      .topbar,
+      .dashboard-title,
+      .map-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .live-pill,
+      .time-card {
+        width: 100%;
+        justify-content: center;
+        text-align: left;
+      }
+
+      .selector-panel,
+      .map-content,
+      .info-panel {
+        padding: 16px;
+      }
+
+      .kpi-grid,
+      .map-footer,
+      .system-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img">
+            <path d="M20 6h24l6 18v29a5 5 0 0 1-5 5H19a5 5 0 0 1-5-5V24L20 6Z" fill="none" stroke="#fff" stroke-width="4" />
+            <path d="M20 25h24M23 42h18" stroke="#16a34a" stroke-width="4" stroke-linecap="round" />
+            <circle cx="23" cy="51" r="3" fill="#2563eb" />
+            <circle cx="41" cy="51" r="3" fill="#2563eb" />
+          </svg>
+        </div>
+        <div>
+          <h1>Smart Traffic Management System</h1>
+          <p>Urban congestion monitoring with predefined traffic intelligence</p>
+        </div>
+      </div>
+      <div class="live-pill"><span class="pulse"></span> Live Simulation Mode</div>
+    </header>
+
+    <section class="hero" aria-label="Traffic selection and overview">
+      <aside class="panel selector-panel">
+        <p class="section-label">Control Center</p>
+        <h2>Location Filter</h2>
+        <p class="copy">Choose a city, district, and area to view congestion status, signal timing, sensor volume, and recommended actions.</p>
+
+        <div class="field">
+          <label for="citySelect">City</label>
+          <select id="citySelect">
+            <option value="">Select city</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="districtSelect">District</label>
+          <select id="districtSelect" disabled>
+            <option value="">Select district</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="areaSelect">Area</label>
+          <select id="areaSelect" disabled>
+            <option value="">Select area</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="primary-btn" id="viewBtn" type="button">View Traffic Report</button>
+          <button class="ghost-btn" id="resetBtn" type="button" title="Reset selections">&#8635;</button>
+        </div>
+
+        <div class="system-strip" aria-label="System summary">
+          <div class="mini-stat">
+            <span>Active Sensors</span>
+            <strong>248</strong>
+          </div>
+          <div class="mini-stat">
+            <span>AI Accuracy</span>
+            <strong>94.7%</strong>
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel map-panel">
+        <div class="map-content">
+          <div class="map-heading">
+            <div>
+              <p class="section-label">Network Map</p>
+              <h2 id="mapTitle">Metro Traffic Overview</h2>
+            </div>
+            <span class="status-badge" id="mapBadge">Awaiting Location</span>
+          </div>
+
+          <svg class="map-svg" viewBox="0 0 780 360" aria-label="Stylized traffic map">
+            <path class="road" d="M40 280 C150 190 250 225 350 160 S560 65 730 115" />
+            <path class="road flow-medium" id="routeA" d="M40 280 C150 190 250 225 350 160 S560 65 730 115" />
+            <path class="road-line" d="M40 280 C150 190 250 225 350 160 S560 65 730 115" />
+
+            <path class="road" d="M140 40 L250 155 L370 270 L545 330" />
+            <path class="road flow-good" id="routeB" d="M140 40 L250 155 L370 270 L545 330" />
+            <path class="road-line" d="M140 40 L250 155 L370 270 L545 330" />
+
+            <path class="road" d="M65 120 L230 120 L405 105 L570 170 L720 265" />
+            <path class="road flow-high" id="routeC" d="M65 120 L230 120 L405 105 L570 170 L720 265" />
+            <path class="road-line" d="M65 120 L230 120 L405 105 L570 170 L720 265" />
+
+            <circle class="node" cx="250" cy="155" r="12" />
+            <circle class="node" cx="350" cy="160" r="12" />
+            <circle class="node" cx="570" cy="170" r="12" />
+            <circle class="node" cx="405" cy="105" r="12" />
+          </svg>
+
+          <div class="map-footer">
+            <div class="map-chip">
+              <span>Primary Corridor</span>
+              <strong id="corridorValue">Not selected</strong>
+            </div>
+            <div class="map-chip">
+              <span>Control Mode</span>
+              <strong id="modeValue">Adaptive</strong>
+            </div>
+            <div class="map-chip">
+              <span>Priority Lane</span>
+              <strong id="priorityValue">Standby</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="empty-state" id="emptyState">
+      <h2>Traffic report ready for selection</h2>
+      <p>Select a complete location and press the report button to display the predefined smart traffic management data.</p>
+    </section>
+
+    <section class="dashboard" id="dashboard" aria-live="polite">
+      <div class="dashboard-title">
+        <div>
+          <p class="section-label">Congestion Result</p>
+          <h2 id="resultTitle">Area Traffic Report</h2>
+          <p id="resultSubtitle">Smart signal and congestion details will appear here.</p>
+        </div>
+        <div class="time-card">
+          <span>Last Updated</span>
+          <strong id="updateTime">--</strong>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <article class="kpi-card">
+          <span>Congestion Level</span>
+          <strong id="congestionValue">--</strong>
+          <p id="congestionNote">--</p>
+        </article>
+        <article class="kpi-card">
+          <span>Average Speed</span>
+          <strong id="speedValue">--</strong>
+          <p>Estimated across main arterial roads</p>
+        </article>
+        <article class="kpi-card">
+          <span>Vehicle Volume</span>
+          <strong id="volumeValue">--</strong>
+          <p>Vehicles detected in the last hour</p>
+        </article>
+        <article class="kpi-card">
+          <span>Predicted Delay</span>
+          <strong id="delayValue">--</strong>
+          <p>AI forecast for peak movement</p>
+        </article>
+      </div>
+
+      <section class="panel traffic-graph" aria-label="Traffic analytics graph">
+        <div class="graph-head">
+          <h3>Traffic Analytics Graph</h3>
+          <span>Yellow / Green / Blue / Purple / Black</span>
+        </div>
+        <div class="bar-graph" id="trafficGraph"></div>
+      </section>
+
+      <div class="details-grid">
+        <section class="panel info-panel">
+          <h3>Adaptive Signal Plan</h3>
+          <ul class="signal-list" id="signalList"></ul>
+        </section>
+
+        <section class="panel info-panel">
+          <h3>Recommended Actions</h3>
+          <ul class="recommend-list" id="recommendList"></ul>
+        </section>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Junction</th>
+              <th>Queue Length</th>
+              <th>Signal Status</th>
+              <th>Incident Risk</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="junctionTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div class="inspect-blocker" id="inspectBlocker" aria-hidden="true">
+    <div>
+      <h2>Inspect option is blocked</h2>
+      <p>This public page restricts right-click, source shortcuts, print/save shortcuts, and developer tools while the traffic dashboard is open.</p>
+    </div>
+  </div>
+
+  <script>
+    function lockInspect(message) {
+      document.body.classList.add("inspect-locked");
+      if (message) {
+        alert(message);
+      }
+    }
+
+    document.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      lockInspect("Right-click inspect is blocked on this public page.");
+    });
+
+    document.addEventListener("keydown", (event) => {
+      const key = event.key.toLowerCase();
+      const blocked =
+        event.key === "F12" ||
+        (event.ctrlKey && event.shiftKey && ["i", "j", "c", "k"].includes(key)) ||
+        (event.ctrlKey && ["u", "s", "p"].includes(key));
+
+      if (blocked) {
+        event.preventDefault();
+        event.stopPropagation();
+        lockInspect("Inspect/source shortcuts are blocked on this public page.");
+      }
+    }, true);
+
+    setInterval(() => {
+      const devToolsDocked = window.outerWidth - window.innerWidth > 170 || window.outerHeight - window.innerHeight > 170;
+      document.body.classList.toggle("inspect-locked", devToolsDocked);
+    }, 900);
+
+    const tamilNaduLocations = [
+      { city: "Ariyalur", district: "Ariyalur", areas: ["Ariyalur", "Jayankondam", "Udayarpalayam", "Sendurai", "Andimadam", "Keezhapalur"] },
+      { city: "Chengalpattu", district: "Chengalpattu", areas: ["Chengalpattu", "Tambaram", "Pallavaram", "Chromepet", "Vandalur", "Thiruporur", "Madurantakam", "Mahabalipuram"] },
+      { city: "Chennai", district: "Chennai", areas: ["T Nagar", "Anna Salai", "Adyar", "Mylapore", "Anna Nagar", "Egmore", "Guindy", "Velachery", "Royapuram", "Sholinganallur"] },
+      { city: "Coimbatore", district: "Coimbatore", areas: ["Gandhipuram", "R S Puram", "Peelamedu", "Singanallur", "Saibaba Colony", "Ukkadam", "Pollachi", "Mettupalayam", "Sulur"] },
+      { city: "Cuddalore", district: "Cuddalore", areas: ["Cuddalore", "Chidambaram", "Neyveli", "Panruti", "Virudhachalam", "Parangipettai", "Kurinjipadi"] },
+      { city: "Dharmapuri", district: "Dharmapuri", areas: ["Dharmapuri", "Harur", "Palacode", "Pennagaram", "Karimangalam", "Pappireddipatti"] },
+      { city: "Dindigul", district: "Dindigul", areas: ["Dindigul", "Palani", "Kodaikanal", "Oddanchatram", "Natham", "Vedasandur", "Nilakottai"] },
+      { city: "Erode", district: "Erode", areas: ["Erode", "Perundurai", "Bhavani", "Gobichettipalayam", "Sathyamangalam", "Modakurichi", "Anthiyur"] },
+      { city: "Kallakurichi", district: "Kallakurichi", areas: ["Kallakurichi", "Chinnasalem", "Sankarapuram", "Ulundurpet", "Tirukoilur", "Kalvarayan Hills"] },
+      { city: "Kancheepuram", district: "Kancheepuram", areas: ["Kancheepuram", "Sriperumbudur", "Kundrathur", "Walajabad", "Uthiramerur", "Oragadam"] },
+      { city: "Nagercoil", district: "Kanniyakumari", areas: ["Nagercoil", "Kanniyakumari", "Colachel", "Padmanabhapuram", "Marthandam", "Thuckalay", "Suchindram"] },
+      { city: "Karur", district: "Karur", areas: ["Karur", "Kulithalai", "Aravakurichi", "Pugalur", "Krishnarayapuram", "Thanthonimalai"] },
+      { city: "Krishnagiri", district: "Krishnagiri", areas: ["Krishnagiri", "Hosur", "Denkanikottai", "Bargur", "Uthangarai", "Shoolagiri"] },
+      { city: "Madurai", district: "Madurai", areas: ["Madurai", "Thiruparankundram", "Melur", "Usilampatti", "Tirumangalam", "Vadipatti", "Anna Nagar", "K K Nagar"] },
+      { city: "Mayiladuthurai", district: "Mayiladuthurai", areas: ["Mayiladuthurai", "Sirkazhi", "Kuthalam", "Tharangambadi", "Poompuhar"] },
+      { city: "Nagapattinam", district: "Nagapattinam", areas: ["Nagapattinam", "Velankanni", "Vedaranyam", "Kilvelur", "Thirukkuvalai", "Nagore"] },
+      { city: "Namakkal", district: "Namakkal", areas: ["Namakkal", "Tiruchengode", "Rasipuram", "Paramathi Velur", "Kumarapalayam", "Mohanur"] },
+      { city: "Ooty", district: "Nilgiris", areas: ["Ooty", "Coonoor", "Kotagiri", "Gudalur", "Pandalur", "Wellington"] },
+      { city: "Perambalur", district: "Perambalur", areas: ["Perambalur", "Kunnam", "Veppanthattai", "Alathur", "Labbaikudikadu"] },
+      { city: "Pudukkottai", district: "Pudukkottai", areas: ["Pudukkottai", "Aranthangi", "Alangudi", "Illuppur", "Viralimalai", "Ponnamaravathi"] },
+      { city: "Ramanathapuram", district: "Ramanathapuram", areas: ["Ramanathapuram", "Rameswaram", "Paramakudi", "Kilakarai", "Kamuthi", "Mudukulathur"] },
+      { city: "Ranipet", district: "Ranipet", areas: ["Ranipet", "Arcot", "Walajah", "Arakkonam", "Sholinghur", "Nemili", "Kalavai"] },
+      { city: "Salem", district: "Salem", areas: ["Salem", "Mettur", "Attur", "Edappadi", "Omalur", "Yercaud", "Sankagiri"] },
+      { city: "Sivaganga", district: "Sivaganga", areas: ["Sivaganga", "Karaikudi", "Devakottai", "Manamadurai", "Singampunari", "Ilayangudi"] },
+      { city: "Tenkasi", district: "Tenkasi", areas: ["Tenkasi", "Courtallam", "Sankarankovil", "Kadayanallur", "Shenkottai", "Alangulam", "Puliyangudi"] },
+      { city: "Thanjavur", district: "Thanjavur", areas: ["Thanjavur", "Kumbakonam", "Pattukkottai", "Orathanadu", "Papanasam", "Thiruvaiyaru"] },
+      { city: "Theni", district: "Theni", areas: ["Theni", "Periyakulam", "Bodinayakanur", "Cumbum", "Andipatti", "Uthamapalayam"] },
+      { city: "Thoothukudi", district: "Thoothukudi", areas: ["Thoothukudi", "Tiruchendur", "Kovilpatti", "Kayathar", "Srivaikuntam", "Sathankulam", "Ettayapuram"] },
+      { city: "Tiruchirappalli", district: "Tiruchirappalli", areas: ["Tiruchirappalli", "Srirangam", "Thiruverumbur", "Lalgudi", "Manapparai", "Musiri", "Thuraiyur"] },
+      { city: "Tirunelveli", district: "Tirunelveli", areas: ["Tirunelveli", "Palayamkottai", "Ambasamudram", "Nanguneri", "Radhapuram", "Cheranmahadevi"] },
+      { city: "Tirupathur", district: "Tirupathur", areas: ["Tirupathur", "Vaniyambadi", "Ambur", "Natrampalli", "Jolarpet", "Alangayam"] },
+      { city: "Tiruppur", district: "Tiruppur", areas: ["Tiruppur", "Avinashi", "Palladam", "Udumalpet", "Dharapuram", "Kangeyam"] },
+      { city: "Tiruvallur", district: "Tiruvallur", areas: ["Tiruvallur", "Avadi", "Ponneri", "Gummidipoondi", "Poonamallee", "Thiruttani", "Minjur"] },
+      { city: "Tiruvannamalai", district: "Tiruvannamalai", areas: ["Tiruvannamalai", "Arani", "Cheyyar", "Chengam", "Polur", "Vandavasi"] },
+      { city: "Tiruvarur", district: "Tiruvarur", areas: ["Tiruvarur", "Mannargudi", "Thiruthuraipoondi", "Nannilam", "Koothanallur", "Muthupet"] },
+      { city: "Vellore", district: "Vellore", areas: ["Vellore", "Katpadi", "Gudiyatham", "Pernambut", "Anaicut", "Bagayam"] },
+      { city: "Viluppuram", district: "Viluppuram", areas: ["Viluppuram", "Tindivanam", "Gingee", "Vanur", "Vikravandi", "Marakkanam"] },
+      { city: "Virudhunagar", district: "Virudhunagar", areas: ["Virudhunagar", "Sivakasi", "Rajapalayam", "Srivilliputhur", "Aruppukkottai", "Sattur", "Kariapatti"] }
+    ];
+
+
+    const additionalTamilNaduLocations = tamilNaduLocations.flatMap((item) =>
+      item.areas
+        .filter((area) => area !== item.city)
+        .map((area) => ({
+          city: area,
+          district: item.district,
+          areas: [
+            area,
+            area + " Main Road",
+            area + " Bus Stand",
+            area + " Market",
+            area + " Railway Station",
+            area + " Bypass",
+            area + " Junction"
+          ]
+        }))
+    );
+    function createTrafficReport(city, district, area, index) {
+      const levels = ["Low", "Medium", "High"];
+      const congestion = levels[(city.length + district.length + area.length + index) % levels.length];
+      const isHigh = congestion === "High";
+      const isMedium = congestion === "Medium";
+      const speed = isHigh ? 14 + (index % 8) : isMedium ? 24 + (index % 10) : 36 + (index % 12);
+      const volume = 3100 + ((city.length * 173 + area.length * 211 + index * 389) % 6200);
+      const delay = (isHigh ? 24 + (index % 14) : isMedium ? 12 + (index % 9) : 5 + (index % 6)) + " min";
+      const queueA = isHigh ? 520 + (index % 180) : isMedium ? 300 + (index % 150) : 120 + (index % 110);
+      const queueB = isHigh ? 430 + (index % 150) : isMedium ? 240 + (index % 120) : 90 + (index % 90);
+      const queueC = isHigh ? 360 + (index % 120) : isMedium ? 210 + (index % 100) : 80 + (index % 70);
+
+      return {
+        congestion: congestion,
+        speed: speed,
+        volume: volume,
+        delay: delay,
+        corridor: area + " Main Road",
+        priority: isHigh ? "Emergency + Bus" : isMedium ? "Public Transit" : "Standby",
+        note: area + " in " + district + " district is showing " + congestion.toLowerCase() + " traffic flow in this simulation.",
+        graph: [
+          { label: "Congestion", value: isHigh ? 92 : isMedium ? 62 : 34, color: "yellow" },
+          { label: "Speed", value: Math.min(100, Math.round(speed * 2.1)), color: "green" },
+          { label: "Volume", value: Math.min(100, Math.round(volume / 95)), color: "blue" },
+          { label: "Delay", value: isHigh ? 86 : isMedium ? 55 : 24, color: "purple" },
+          { label: "Signal Load", value: isHigh ? 78 : isMedium ? 48 : 28, color: "black" }
+        ],
+        signals: [
+          [area + " Junction", isHigh ? "Green extended by 45 sec" : isMedium ? "Green extended by 25 sec" : "Normal adaptive cycle", congestion],
+          [city + " Bus Stand", isHigh ? "Transit priority active" : "Balanced cycle active", isHigh ? "High" : "Medium"],
+          [district + " Bypass", isHigh ? "Diversion advisory enabled" : "Queue monitoring enabled", isMedium ? "Medium" : "Low"]
+        ],
+        recommendations: [
+          [isHigh ? "Activate diversion plan near " + area : "Maintain adaptive signal timing for " + area, congestion],
+          ["Keep bus and emergency priority ready at " + city, isHigh ? "High" : "Medium"],
+          ["Monitor junction queue from control room", isHigh ? "Medium" : "Low"]
+        ],
+        junctions: [
+          [area + " Junction", queueA + " m", isHigh ? "Critical" : "Adaptive", congestion, isHigh ? "Open alternate route" : "Maintain cycle timing"],
+          [city + " Bus Stand", queueB + " m", "Priority", isHigh ? "High" : "Medium", "Protect public transport lane"],
+          [district + " Bypass", queueC + " m", "Balanced", isMedium ? "Medium" : "Low", "Watch approach density"]
+        ]
+      };
+    }
+
+    const allTamilNaduLocations = tamilNaduLocations.concat(additionalTamilNaduLocations).sort((a, b) => a.city.localeCompare(b.city));
+
+    const trafficData = allTamilNaduLocations.reduce((data, item, cityIndex) => {
+      data[item.city] = data[item.city] || {};
+      data[item.city][item.district] = data[item.city][item.district] || {};
+      item.areas.forEach((area, areaIndex) => {
+        data[item.city][item.district][area] = createTrafficReport(item.city, item.district, area, cityIndex + areaIndex);
+      });
+      return data;
+    }, {});
+
+    const citySelect = document.getElementById("citySelect");
+    const districtSelect = document.getElementById("districtSelect");
+    const areaSelect = document.getElementById("areaSelect");
+    const viewBtn = document.getElementById("viewBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const dashboard = document.getElementById("dashboard");
+    const emptyState = document.getElementById("emptyState");
+
+    const resultTitle = document.getElementById("resultTitle");
+    const resultSubtitle = document.getElementById("resultSubtitle");
+    const updateTime = document.getElementById("updateTime");
+    const congestionValue = document.getElementById("congestionValue");
+    const congestionNote = document.getElementById("congestionNote");
+    const speedValue = document.getElementById("speedValue");
+    const volumeValue = document.getElementById("volumeValue");
+    const delayValue = document.getElementById("delayValue");
+    const signalList = document.getElementById("signalList");
+    const recommendList = document.getElementById("recommendList");
+    const junctionTable = document.getElementById("junctionTable");
+    const mapTitle = document.getElementById("mapTitle");
+    const mapBadge = document.getElementById("mapBadge");
+    const corridorValue = document.getElementById("corridorValue");
+    const modeValue = document.getElementById("modeValue");
+    const priorityValue = document.getElementById("priorityValue");
+    const routeA = document.getElementById("routeA");
+    const routeB = document.getElementById("routeB");
+    const routeC = document.getElementById("routeC");
+    const trafficGraph = document.getElementById("trafficGraph");
+
+    function addOptions(select, options, placeholder) {
+      select.innerHTML = `<option value="">${placeholder}</option>`;
+      options.forEach((option) => {
+        const item = document.createElement("option");
+        item.value = option;
+        item.textContent = option;
+        select.appendChild(item);
+      });
+    }
+
+    function getSelectedData() {
+      const city = citySelect.value;
+      const district = districtSelect.value;
+      const area = areaSelect.value;
+      if (!city || !district || !area) return null;
+      return {
+        city,
+        district,
+        area,
+        data: trafficData[city][district][area]
+      };
+    }
+
+    function severityClass(level) {
+      if (level === "High") return "high";
+      if (level === "Medium") return "medium";
+      return "good";
+    }
+
+    function setRouteColors(level) {
+      routeA.className.baseVal = `road flow-${level === "Low" ? "good" : level.toLowerCase()}`;
+      routeB.className.baseVal = "road flow-good";
+      routeC.className.baseVal = `road flow-${level === "High" ? "high" : "medium"}`;
+    }
+
+    function renderTrafficGraph(data) {
+      trafficGraph.innerHTML = data.graph.map((item) => {
+        const size = Math.max(10, Math.min(100, item.value));
+        return '<div class="graph-bar" style="--bar-width: ' + size + '%">' +
+          '<div class="graph-fill graph-' + item.color + '" style="height: ' + size + '%"></div>' +
+          '<div class="graph-label"><span>' + item.label + '</span><strong>' + item.value + '%</strong></div>' +
+        '</div>';
+      }).join("");
+    }
+
+    function renderReport() {
+      const selected = getSelectedData();
+
+      if (!selected) {
+        alert("Please select city, district, and area before viewing the report.");
+        return;
+      }
+
+      const { city, district, area, data } = selected;
+      const areaName = data.displayName || area;
+      const statusClass = severityClass(data.congestion);
+
+      dashboard.classList.add("active");
+      emptyState.style.display = "none";
+
+      resultTitle.textContent = `${areaName}, ${city}`;
+      resultSubtitle.textContent = `${district} district traffic intelligence report for the selected urban area.`;
+      updateTime.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      congestionValue.textContent = data.congestion;
+      congestionValue.style.color = `var(--${statusClass === "good" ? "green" : statusClass})`;
+      congestionNote.textContent = data.note;
+      speedValue.textContent = `${data.speed} km/h`;
+      volumeValue.textContent = data.volume.toLocaleString();
+      delayValue.textContent = data.delay;
+
+      mapTitle.textContent = `${areaName} Traffic Network`;
+      mapBadge.textContent = `${data.congestion} Congestion`;
+      mapBadge.style.background = `var(--${statusClass === "good" ? "green" : statusClass})`;
+      corridorValue.textContent = data.corridor;
+      modeValue.textContent = data.congestion === "High" ? "Incident Adaptive" : "Adaptive";
+      priorityValue.textContent = data.priority;
+      setRouteColors(data.congestion);
+      renderTrafficGraph(data);
+
+      signalList.innerHTML = data.signals.map(([junction, plan, level]) => `
+        <li>
+          <div><strong>${junction}</strong><br>${plan}</div>
+          <span class="tag ${severityClass(level)}">${level}</span>
+        </li>
+      `).join("");
+
+      recommendList.innerHTML = data.recommendations.map(([action, level]) => `
+        <li>
+          <strong>${action}</strong>
+          <span class="tag ${severityClass(level)}">${level}</span>
+        </li>
+      `).join("");
+
+      junctionTable.innerHTML = data.junctions.map(([junction, queue, status, risk, action]) => `
+        <tr>
+          <td><strong>${junction}</strong></td>
+          <td>${queue}</td>
+          <td><span class="tag blue">${status}</span></td>
+          <td><span class="tag ${severityClass(risk)}">${risk}</span></td>
+          <td>${action}</td>
+        </tr>
+      `).join("");
+    }
+
+    citySelect.addEventListener("change", () => {
+      const city = citySelect.value;
+      dashboard.classList.remove("active");
+      emptyState.style.display = "block";
+      addOptions(districtSelect, city ? Object.keys(trafficData[city]) : [], "Select district");
+      addOptions(areaSelect, [], "Select area");
+      districtSelect.disabled = !city;
+      areaSelect.disabled = true;
+    });
+
+    districtSelect.addEventListener("change", () => {
+      const city = citySelect.value;
+      const district = districtSelect.value;
+      dashboard.classList.remove("active");
+      emptyState.style.display = "block";
+      addOptions(areaSelect, district ? Object.keys(trafficData[city][district]) : [], "Select area");
+      areaSelect.disabled = !district;
+    });
+
+    areaSelect.addEventListener("change", () => {
+      dashboard.classList.remove("active");
+      emptyState.style.display = "block";
+    });
+
+    resetBtn.addEventListener("click", () => {
+      citySelect.value = "";
+      addOptions(districtSelect, [], "Select district");
+      addOptions(areaSelect, [], "Select area");
+      districtSelect.disabled = true;
+      areaSelect.disabled = true;
+      dashboard.classList.remove("active");
+      emptyState.style.display = "block";
+      mapTitle.textContent = "Metro Traffic Overview";
+      mapBadge.textContent = "Awaiting Location";
+      mapBadge.style.background = "rgba(255, 255, 255, 0.13)";
+      corridorValue.textContent = "Not selected";
+      modeValue.textContent = "Adaptive";
+      priorityValue.textContent = "Standby";
+      setRouteColors("Medium");
+    });
+
+    viewBtn.addEventListener("click", renderReport);
+
+    addOptions(citySelect, Object.keys(trafficData), "Select city");
+  </script>
+  <h6 style="color: greenyellow; text-align: center;">
+    ✔ MK Freelancers<br>
+  Verified Business Services
+</h6>
+</body>
+</html>
+
